@@ -3,20 +3,19 @@ package org.serratec.backend.controller;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
+
 import org.serratec.backend.models.Funcionario;
 import org.serratec.backend.repository.FuncionarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/funcionario")
@@ -26,10 +25,9 @@ public class FuncionarioController {
 	private FuncionarioRepository funcionarioRepository;
 	
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public Funcionario inserir(@RequestBody Funcionario funcionario) {
+	public ResponseEntity<?> inserir(@Valid @RequestBody Funcionario funcionario) {
 		funcionario = funcionarioRepository.save(funcionario);
-		return funcionario;		
+		return ResponseEntity.status(HttpStatus.CREATED).body(funcionario);
 	}
 	
 	@GetMapping
@@ -47,12 +45,13 @@ public class FuncionarioController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Funcionario> atualizar(@PathVariable Long id, @RequestBody Funcionario funcionario) {
+	public ResponseEntity<?> atualizar(@PathVariable Long id, @Valid @RequestBody Funcionario funcionario) {
 		boolean exists = funcionarioRepository.existsById(id);
 		if (!exists) {
 			return ResponseEntity.notFound().build();
 		}
 		
+		funcionario.setId(id);  
 		funcionario = funcionarioRepository.save(funcionario);
 		return ResponseEntity.ok(funcionario);
 	}
@@ -66,4 +65,16 @@ public class FuncionarioController {
 		funcionarioRepository.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}	
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		Map<String, String> errors = new HashMap<>();
+		ex.getBindingResult().getAllErrors().forEach((error) -> {
+			String fieldName = ((FieldError) error).getField();
+			String errorMessage = error.getDefaultMessage();
+			errors.put(fieldName, errorMessage);
+		});
+		return errors;
+	}
 }
