@@ -1,71 +1,62 @@
 package org.serratec.backend.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
-@Entity
-@Table(name = "endereco")
+@Embeddable
 public class Endereco {
-	
-	@NotBlank
-	@Column(nullable = false)
-	private String rua;
-	
-	@NotBlank
-	@Column(nullable = false)
-	private String cidade;
-	
-	@NotBlank
-	@Column(nullable = false)
-	private String estado;
-		
-	@NotBlank
-	@Size(max = 9)
-	@Column(nullable = false, length = 9)
-	private String cep;
 
-	public Endereco(String rua, String cidade, String estado, String cep) {
-		this.rua = rua;
-		this.cidade = cidade;
-		this.estado = estado;
+    @NotBlank(message = "O CEP não pode estar em branco.")
+    private String cep;
+
+    @NotBlank(message = "A rua não pode estar em branco.")
+    private String rua;
+
+    @NotBlank(message = "A cidade não pode estar em branco.")
+    private String cidade;
+
+    @NotBlank(message = "O estado não pode estar em branco.")
+    private String estado;
+    
+    public Endereco(String cep, String rua, String cidade, String estado) {
 		this.cep = cep;
-	} 
-	
-	public Endereco() {
-	}
-	
-	public String getRua() {
-		return rua;
-	}
-
-	public void setRua(String rua) {
 		this.rua = rua;
-	}
-
-	public String getCidade() {
-		return cidade;
-	}
-
-	public void setCidade(String cidade) {
 		this.cidade = cidade;
-	}
-
-	public String getEstado() {
-		return estado;
-	}
-
-	public void setEstado(String estado) {
 		this.estado = estado;
 	}
+    
+    public Endereco() {
+    }
 
 	public String getCep() {
-		return cep;
-	}
+        return cep;
+    }
 
-	public void setCep(String cep) {
-		this.cep = cep;
-	}	
+    public void setCep(String cep) {
+        this.cep = cep;
+    }
+
+    public String getRua() {
+        return rua;
+    }
+
+    public void setRua(String rua) {
+        this.rua = rua;
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
 }
